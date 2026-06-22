@@ -1,5 +1,10 @@
 import customtkinter as ctk
 import tkinter as tk
+from backend.auth import login_user
+from tkinter import messagebox
+from frontend.signup import SignupPage
+from frontend.forgot_password import ForgotPasswordPage
+from frontend.dashboard import DashboardPage  # Integrated dashboard component
 
 # --- Color Palette Constants ---
 PRIMARY_BLUE = "#4F5BD5"
@@ -20,8 +25,6 @@ class LoginPage:
         self.root.geometry("1280x720")
         self.root.after(100, lambda: self.root.state("zoomed"))
 
-        
-        
         # Maximize window (cross-platform handling)
         try:
             self.root.state('zoomed')
@@ -30,11 +33,14 @@ class LoginPage:
 
         self.root.configure(fg_color=BACKGROUND)
 
+        # Main containing base frame to facilitate easy page switching
+        self.main_frame = ctk.CTkFrame(self.root, fg_color="transparent")
+        self.main_frame.pack(fill="both", expand=True)
+
         # --- Main Grid Layout ---
-        # Divide screen into two equal columns
-        self.root.grid_columnconfigure(0, weight=1, uniform="group1")
-        self.root.grid_columnconfigure(1, weight=1, uniform="group1")
-        self.root.grid_rowconfigure(0, weight=1)
+        self.main_frame.grid_columnconfigure(0, weight=1, uniform="group1")
+        self.main_frame.grid_columnconfigure(1, weight=1, uniform="group1")
+        self.main_frame.grid_rowconfigure(0, weight=1)
 
         # Create main left and right panels
         self._create_left_panel()
@@ -42,15 +48,12 @@ class LoginPage:
 
     def _create_left_panel(self):
         """Creates the left panel containing the login form."""
-        self.left_frame = ctk.CTkFrame(self.root, fg_color=BACKGROUND, corner_radius=0)
+        self.left_frame = ctk.CTkFrame(self.main_frame, fg_color=BACKGROUND, corner_radius=0)
         self.left_frame.grid(row=0, column=0, sticky="nsew")
 
-        # Container to center the login form vertically and horizontally
         login_container = ctk.CTkFrame(self.left_frame, fg_color="transparent")
         login_container.place(relx=0.5, rely=0.5, anchor="center")
 
-        # --- Header Section ---
-        # Logo / Title
         logo_label = ctk.CTkLabel(
             login_container, 
             text="🎓 Student Management System",
@@ -59,7 +62,6 @@ class LoginPage:
         )
         logo_label.pack(anchor="w", pady=(0, 40))
 
-        # Welcome Back Heading
         welcome_label = ctk.CTkLabel(
             login_container, 
             text="Welcome Back",
@@ -68,7 +70,6 @@ class LoginPage:
         )
         welcome_label.pack(anchor="w", pady=(0, 5))
 
-        # Subtitle
         subtitle_label = ctk.CTkLabel(
             login_container, 
             text="Login to continue to your account",
@@ -77,8 +78,6 @@ class LoginPage:
         )
         subtitle_label.pack(anchor="w", pady=(0, 40))
 
-        # --- Form Section ---
-        # Username Entry
         username_label = ctk.CTkLabel(login_container, text="Username", font=("Segoe UI", 12, "bold"), text_color=TEXT_DARK)
         username_label.pack(anchor="w", pady=(0, 5))
         
@@ -95,7 +94,6 @@ class LoginPage:
         )
         self.username_entry.pack(anchor="w", pady=(0, 20))
 
-        # Password Entry
         password_label = ctk.CTkLabel(login_container, text="Password", font=("Segoe UI", 12, "bold"), text_color=TEXT_DARK)
         password_label.pack(anchor="w", pady=(0, 5))
         
@@ -113,11 +111,9 @@ class LoginPage:
         )
         self.password_entry.pack(anchor="w", pady=(0, 15))
 
-        # --- Options Section (Checkbox & Forgot Password) ---
         options_frame = ctk.CTkFrame(login_container, fg_color="transparent", width=400)
         options_frame.pack(fill="x", pady=(0, 30))
 
-        # Show Password Checkbox
         self.show_password_var = ctk.BooleanVar(value=False)
         show_password_cb = ctk.CTkCheckBox(
             options_frame, 
@@ -132,7 +128,6 @@ class LoginPage:
         )
         show_password_cb.pack(side="left")
 
-        # Forgot Password Link
         forgot_password_btn = ctk.CTkButton(
             options_frame, 
             text="Forgot Password?",
@@ -144,8 +139,6 @@ class LoginPage:
         )
         forgot_password_btn.pack(side="right")
 
-        # --- Action Buttons Section ---
-        # Login Button
         login_btn = ctk.CTkButton(
             login_container, 
             text="Login",
@@ -159,7 +152,6 @@ class LoginPage:
         )
         login_btn.pack(anchor="w", pady=(0, 30))
 
-        # Sign Up Link Area
         signup_frame = ctk.CTkFrame(login_container, fg_color="transparent")
         signup_frame.pack(anchor="center")
 
@@ -185,14 +177,12 @@ class LoginPage:
 
     def _create_right_panel(self):
         """Creates the right panel showing the dashboard preview."""
-        self.right_frame = ctk.CTkFrame(self.root, fg_color=PANEL_BG, corner_radius=0)
+        self.right_frame = ctk.CTkFrame(self.main_frame, fg_color=PANEL_BG, corner_radius=0)
         self.right_frame.grid(row=0, column=1, sticky="nsew")
 
-        # Dashboard Preview Container
         preview_container = ctk.CTkFrame(self.right_frame, fg_color="transparent")
         preview_container.place(relx=0.5, rely=0.5, anchor="center")
 
-        # Mockup App Window
         app_mockup = ctk.CTkFrame(
             preview_container, 
             fg_color=BACKGROUND, 
@@ -203,7 +193,6 @@ class LoginPage:
         app_mockup.pack_propagate(False)
         app_mockup.pack(padx=20, pady=20)
 
-        # Mockup Header
         mockup_header = ctk.CTkLabel(
             app_mockup,
             text="Dashboard Overview",
@@ -212,7 +201,6 @@ class LoginPage:
         )
         mockup_header.pack(anchor="w", padx=30, pady=(30, 20))
 
-        # Mockup Stats Grid
         stats_frame = ctk.CTkFrame(app_mockup, fg_color="transparent")
         stats_frame.pack(fill="both", expand=True, padx=30, pady=(0, 30))
         
@@ -221,7 +209,6 @@ class LoginPage:
         stats_frame.grid_rowconfigure(0, weight=1, pad=15)
         stats_frame.grid_rowconfigure(1, weight=1, pad=15)
 
-        # Define stat cards data
         cards_data = [
             ("Students", "1250", 0, 0),
             ("Courses", "24", 0, 1),
@@ -229,41 +216,76 @@ class LoginPage:
             ("Attendance", "92%", 1, 1)
         ]
 
-        # Generate Statistic Cards
         for title, value, row, col in cards_data:
             card = ctk.CTkFrame(stats_frame, fg_color=WHITE, corner_radius=12)
             card.grid(row=row, column=col, sticky="nsew", padx=10, pady=10)
             
-            # Card contents
             title_lbl = ctk.CTkLabel(card, text=title, font=("Segoe UI", 13), text_color=TEXT_GRAY)
             title_lbl.pack(anchor="w", padx=20, pady=(15, 0))
             
             val_lbl = ctk.CTkLabel(card, text=value, font=("Segoe UI", 28, "bold"), text_color=TEXT_DARK)
             val_lbl.pack(anchor="w", padx=20, pady=(0, 15))
 
-    # --- Button Callbacks and Logic ---
     def _toggle_password_visibility(self):
-        """Toggles the password entry show character."""
         if self.show_password_var.get():
             self.password_entry.configure(show="")
         else:
             self.password_entry.configure(show="*")
 
     def _login_clicked(self):
-        """Handles login button click event."""
-        print("Login Clicked")
+        username = self.username_entry.get().strip()
+        password = self.password_entry.get().strip()
+
+        if not username or not password:
+            messagebox.showwarning(
+                "Warning",
+                "Please fill all required fields."
+            )
+            return
+
+        user = login_user(username, password)
+
+        if user:
+            messagebox.showinfo(
+                "Success",
+                "Login Successful."
+            )
+
+            self.main_frame.destroy()
+
+            self.dashboard_frame = DashboardPage(self.root)
+            self.dashboard_frame.pack(fill="both", expand=True)
+
+        else:
+            messagebox.showerror(
+                "Error",
+                "Invalid username or password."
+            )
 
     def _forgot_password_clicked(self):
-        """Handles forgot password link click event."""
-        print("Forgot Password Clicked")
+        self.main_frame.destroy()
+
+        ForgotPasswordPage(
+            self.root,
+            on_back=self._restore_login_view
+        )
 
     def _signup_clicked(self):
-        """Handles sign up link click event."""
-        print("Sign Up Clicked")
+        # Clear out current login frame view, switch seamlessly to SignUp component
+        self.main_frame.destroy()
+        SignupPage(self.root, on_back=self._restore_login_view)
 
+    def _restore_login_view(self):
+        # Regenerate login interface structures onto root frame
+        self.main_frame = ctk.CTkFrame(self.root, fg_color="transparent")
+        self.main_frame.pack(fill="both", expand=True)
+        self.main_frame.grid_columnconfigure(0, weight=1, uniform="group1")
+        self.main_frame.grid_columnconfigure(1, weight=1, uniform="group1")
+        self.main_frame.grid_rowconfigure(0, weight=1)
+        self._create_left_panel()
+        self._create_right_panel()
 
 if __name__ == "__main__":
-    # Initialize the application
     root = ctk.CTk()
     app = LoginPage(root)
     root.mainloop()

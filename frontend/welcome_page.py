@@ -102,7 +102,7 @@ class WelcomePage(ctk.CTk):
             fg_color="#4F5BD5",
             hover_color="#3F4ACB",
             font=("Segoe UI", 22, "bold"),
-            command=lambda: None
+            command=self.open_login
         )
         get_started_btn.pack(anchor="w")
 
@@ -198,6 +198,14 @@ class WelcomePage(ctk.CTk):
             text_color="#6B7280"
         )
         title_label.pack()
+    
+    def open_login(self):
+        print("Open Login Page")
+        from frontend.login import LoginPage
+        self.destroy()
+        root = ctk.CTk()
+        LoginPage(root)
+        root.mainloop()
 
 
 if __name__ == "__main__":

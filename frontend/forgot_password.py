@@ -1,4 +1,5 @@
 import tkinter
+from tkinter import messagebox
 import customtkinter as ctk
 
 PRIMARY_BLUE = "#4F5BD5"
@@ -17,9 +18,11 @@ ctk.set_default_color_theme("blue")
 
 
 class ForgotPasswordPage(ctk.CTkFrame):
-    def __init__(self, master):
+    def __init__(self, master, on_back=None):
         super().__init__(master, fg_color=BACKGROUND)
         self.pack(fill="both", expand=True)
+
+        self.on_back = on_back
 
         self._show_password = False
         self._show_confirm = False
@@ -61,19 +64,19 @@ class ForgotPasswordPage(ctk.CTkFrame):
         )
         logo_label.grid(row=0, column=0, sticky="w")
 
-        back_btn = ctk.CTkButton(
+        reset_top_btn = ctk.CTkButton(
             bar,
-            text="← Back to Login",
-            font=("Helvetica", 13),
-            text_color=PRIMARY_BLUE,
-            fg_color="transparent",
-            hover_color=PANEL_BG,
-            width=120,
+            text="Reset Password",
+            font=("Helvetica", 13, "bold"),
+            text_color=WHITE,
+            fg_color=PRIMARY_BLUE,
+            hover_color=HOVER_BLUE,
+            width=140,
             height=32,
             corner_radius=6,
-            command=self.handle_back_to_login,
+            command=self.handle_reset_password,
         )
-        back_btn.grid(row=0, column=2, sticky="e")
+        reset_top_btn.grid(row=0, column=2, sticky="e")
 
     def _build_form(self, parent):
         form = ctk.CTkFrame(parent, fg_color="transparent")
@@ -210,7 +213,7 @@ class ForgotPasswordPage(ctk.CTkFrame):
             border_width=1,
             border_color=SUBTLE_BORDER,
         )
-        notice.grid(row=10, column=0, sticky="ew", pady=(0, 28))
+        notice.grid(row=10, column=0, sticky="ew", pady=(0, 20))
 
         notice_title = ctk.CTkLabel(
             notice,
@@ -230,19 +233,6 @@ class ForgotPasswordPage(ctk.CTkFrame):
             wraplength=400,
         )
         notice_body.pack(anchor="w", padx=16, pady=(0, 12))
-
-        reset_btn = ctk.CTkButton(
-            form,
-            text="Reset Password",
-            font=("Helvetica", 15, "bold"),
-            height=50,
-            corner_radius=8,
-            fg_color=PRIMARY_BLUE,
-            hover_color=HOVER_BLUE,
-            text_color=WHITE,
-            command=self.handle_reset_password,
-        )
-        reset_btn.grid(row=11, column=0, sticky="ew")
 
     def _build_footer(self, parent):
         footer = ctk.CTkFrame(parent, fg_color="transparent")
@@ -397,10 +387,44 @@ class ForgotPasswordPage(ctk.CTkFrame):
             val_label.pack(anchor="w", pady=(2, 0))
 
     def handle_reset_password(self):
-        print("Reset Password Clicked")
+        username = self.username_entry.get().strip()
+        password = self.password_entry.get().strip()
+        confirm = self.confirm_entry.get().strip()
+
+        if not username or not password or not confirm:
+            messagebox.showwarning(
+                "Warning",
+                "Please fill in all fields."
+            )
+            return
+
+        if password != confirm:
+            messagebox.showerror(
+                "Error",
+                "Passwords do not match."
+            )
+            return
+
+        from backend.auth import reset_password
+        success = reset_password(username, password)
+
+        if not success:
+            messagebox.showerror(
+                "Error",
+                "Username not found."
+            )
+            return
+
+        messagebox.showinfo(
+            "Success",
+            "Password updated successfully."
+        )
+        self.handle_back_to_login()
 
     def handle_back_to_login(self):
-        print("Back To Login Clicked")
+        self.destroy()
+        if self.on_back:
+            self.on_back()
 
     def toggle_password_visibility(self):
         self._show_password = self._pw_var.get()
