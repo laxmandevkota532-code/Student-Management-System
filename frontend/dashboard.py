@@ -1,8 +1,10 @@
 import customtkinter as ctk
-
-# ── Navigation imports ───────────────────────────────────────────────────────
-from student_management_page import StudentManagementPage
-# from settings_page import SettingsPage
+from frontend.student_management_page import StudentManagementPage
+from frontend.course_management_page import CoursesPage
+from frontend.teachers_management_page import TeachersPage
+from frontend.attendance_page import AttendancePage
+from frontend.reports_page import ReportsPage
+from frontend.setting_page import SettingsPage
 
 # Color Palette Configuration
 PRIMARY_BLUE = "#4F5BD5"
@@ -17,6 +19,132 @@ WHITE = "#FFFFFF"
 ctk.set_appearance_mode("Light")
 ctk.set_default_color_theme("blue")
 
+class DashboardHomePage(ctk.CTkScrollableFrame):
+    """Reusable page class for the main dashboard overview."""
+    def __init__(self, master):
+        super().__init__(master, fg_color=BACKGROUND, corner_radius=0)
+        
+        # Inner padding for the page content
+        self.container = ctk.CTkFrame(self, fg_color="transparent")
+        self.container.pack(fill="both", expand=True, padx=30, pady=25)
+
+        # Header Title
+        content_title = ctk.CTkLabel(
+            self.container, 
+            text="Dashboard Overview", 
+            font=("Helvetica", 24, "bold"), 
+            text_color=TEXT_DARK
+        )
+        content_title.pack(anchor="w", pady=(0, 20))
+
+        # --- Statistics Configuration Layer Grid ---
+        stats_frame = ctk.CTkFrame(self.container, fg_color="transparent")
+        stats_frame.pack(fill="x", pady=(0, 30))
+        for i in range(4):
+            stats_frame.grid_columnconfigure(i, weight=1, uniform="stat_card")
+
+        stats_data = [
+            ("Total Students", "1,250", 0),
+            ("Total Courses", "24", 1),
+            ("Total Teachers", "45", 2),
+            ("Attendance Rate", "92%", 3)
+        ]
+
+        for title, value, col in stats_data:
+            card = ctk.CTkFrame(stats_frame, fg_color=WHITE, corner_radius=12, border_width=1, border_color="#E5E7EB", height=110)
+            card.grid(row=0, column=col, padx=8, sticky="nsew")
+            card.pack_propagate(False)
+            
+            # Left vertical aesthetic accent marker strip
+            accent = ctk.CTkFrame(card, fg_color=PRIMARY_BLUE, width=5, corner_radius=0)
+            accent.pack(side="left", fill="y")
+
+            card_body = ctk.CTkFrame(card, fg_color="transparent")
+            card_body.pack(side="left", fill="both", expand=True, padx=15, pady=15)
+
+            ctk.CTkLabel(card_body, text=title, font=("Helvetica", 13), text_color=TEXT_GRAY).pack(anchor="w")
+            ctk.CTkLabel(card_body, text=value, font=("Helvetica", 26, "bold"), text_color=TEXT_DARK).pack(anchor="w", pady=(2, 0))
+
+        # --- Split MidSection: Left Table vs Right Side Quick Utilities ---
+        split_frame = ctk.CTkFrame(self.container, fg_color="transparent")
+        split_frame.pack(fill="both", expand=True)
+        split_frame.grid_columnconfigure(0, weight=3, uniform="split_pane")
+        split_frame.grid_columnconfigure(1, weight=1, uniform="split_pane")
+
+        # Left Container: Recent Students Struct
+        table_container = ctk.CTkFrame(split_frame, fg_color=WHITE, corner_radius=12, border_width=1, border_color="#E5E7EB")
+        table_container.grid(row=0, column=0, padx=(0, 12), sticky="nsew")
+
+        ctk.CTkLabel(table_container, text="Recent Students", font=("Helvetica", 16, "bold"), text_color=TEXT_DARK).pack(anchor="w", pady=(15, 15), padx=20)
+
+        # Table Header Layout Config
+        headers = ["Student ID", "Name", "Course", "Email", "Status"]
+        hdr_frame = ctk.CTkFrame(table_container, fg_color=PANEL_BG, height=35, corner_radius=6)
+        hdr_frame.pack(fill="x", pady=(0, 8), padx=20)
+        for idx, h_text in enumerate(headers):
+            hdr_frame.grid_columnconfigure(idx, weight=1, uniform="tbl_col")
+            ctk.CTkLabel(hdr_frame, text=h_text, font=("Helvetica", 12, "bold"), text_color=TEXT_DARK).grid(row=0, column=idx, sticky="w", padx=10, pady=5)
+
+        # Mock Student Data Sets
+        student_records = [
+            ("ST001", "John Doe", "BCA", "john@gmail.com", "Active"),
+            ("ST002", "Jane Smith", "BIT", "jane@gmail.com", "Active"),
+            ("ST003", "Michael Johnson", "CSIT", "michael@gmail.com", "Active"),
+            ("ST004", "Emily Brown", "BCA", "emily@gmail.com", "Active")
+        ]
+
+        # Populate Rows Inline
+        for row_idx, data in enumerate(student_records):
+            row_frame = ctk.CTkFrame(table_container, fg_color="transparent")
+            row_frame.pack(fill="x", pady=4, padx=20)
+            
+            for col_idx, text_val in enumerate(data):
+                row_frame.grid_columnconfigure(col_idx, weight=1, uniform="tbl_col")
+                
+                if col_idx == 4: # Status processing color styling rule
+                    lbl = ctk.CTkLabel(row_frame, text=text_val, font=("Helvetica", 12, "bold"), text_color="#10B981", fg_color="#D1FAE5", corner_radius=6, width=65, height=22)
+                    lbl.grid(row=0, column=col_idx, sticky="w", padx=10, pady=5)
+                else:
+                    ctk.CTkLabel(row_frame, text=text_val, font=("Helvetica", 13), text_color=TEXT_DARK).grid(row=0, column=col_idx, sticky="w", padx=10, pady=5)
+
+            # Horizontal separation grid rule lines
+            if row_idx < len(student_records) - 1:
+                ctk.CTkFrame(table_container, fg_color="#F3F4F6", height=1).pack(fill="x", pady=2, padx=20)
+
+        # Right Container: Quick Actions Grid Setup
+        actions_container = ctk.CTkFrame(split_frame, fg_color=WHITE, corner_radius=12, border_width=1, border_color="#E5E7EB")
+        actions_container.grid(row=0, column=1, padx=(12, 0), sticky="nsew")
+
+        ctk.CTkLabel(actions_container, text="Quick Actions", font=("Helvetica", 16, "bold"), text_color=TEXT_DARK).pack(anchor="w", pady=(15, 15), padx=20)
+
+        actions_list = [
+            ("➕ Add Student", self.action_add_student),
+            ("📚 Add Course", self.action_add_course),
+            ("📊 Generate Report", self.action_gen_report),
+            ("📅 Attendance Tracking", self.action_take_attendance)
+        ]
+
+        for act_text, act_cmd in actions_list:
+            ctk.CTkButton(
+                actions_container,
+                text=act_text,
+                font=("Helvetica", 13, "bold"),
+                fg_color=PANEL_BG,
+                text_color=PRIMARY_BLUE,
+                hover_color="#E0E7FF",
+                height=45,
+                corner_radius=8,
+                anchor="w",
+                command=act_cmd
+            ).pack(fill="x", pady=6, padx=20)
+
+    # --- QUICK UTILITY INTERACTION EVENT METHODS ---
+    def action_add_student(self): print("Action: Add Student Launched")
+    def action_add_course(self): print("Action: Add Course Launched")
+    def action_gen_report(self): print("Action: Generate Report Launched")
+    def action_take_attendance(self): print("Action: Attendance Launched")
+
+
 class DashboardPage(ctk.CTkFrame):
     def __init__(self, master):
         super().__init__(master, fg_color=BACKGROUND)
@@ -27,63 +155,95 @@ class DashboardPage(ctk.CTkFrame):
         self.grid_columnconfigure(1, weight=1)
         self.grid_rowconfigure(0, weight=1)
 
+        self.menu_buttons = {}
+        self.content_frame = None
+
         # Build structural interface segments
         self.create_sidebar()
-
+        
         # Right Side Container (Holds Top Bar + Content Canvas)
         self.right_container = ctk.CTkFrame(self, fg_color=BACKGROUND, corner_radius=0)
         self.right_container.grid(row=0, column=1, sticky="nsew")
         self.right_container.grid_columnconfigure(0, weight=1)
         self.right_container.grid_rowconfigure(1, weight=1)
-
+        
         self.create_top_bar()
-        self.create_main_content()
+        
+        # Load default page
+        self.menu_dashboard()
+
+    def show_page(self, page_class):
+        """Generic method to clear current content and load a new page."""
+        if self.content_frame is not None:
+            self.content_frame.destroy()
+
+        self.content_frame = page_class(self.right_container)
+        self.content_frame.grid(row=1, column=0, sticky="nsew")
+
+    def set_active_menu(self, active_text):
+        """Updates the styling of sidebar buttons based on active selection."""
+        for text, btn in self.menu_buttons.items():
+            if text == active_text:
+                btn.configure(
+                    fg_color=PRIMARY_BLUE,
+                    text_color=WHITE,
+                    hover_color=HOVER_BLUE,
+                    font=("Helvetica", 14, "bold")
+                )
+            else:
+                btn.configure(
+                    fg_color="transparent",
+                    text_color=TEXT_DARK,
+                    hover_color=PANEL_BG,
+                    font=("Helvetica", 14, "normal")
+                )
 
     def create_sidebar(self):
         """Creates the static Left Navigation Panel."""
-        sidebar = ctk.CTkFrame(self, fg_color=WHITE, width=250, corner_radius=0, border_width=1, border_color="#E5E7EB")
-        sidebar.grid(row=0, column=0, sticky="nsew")
-        sidebar.grid_propagate(False)
+        self.sidebar = ctk.CTkFrame(self, fg_color=WHITE, width=250, corner_radius=0, border_width=1, border_color="#E5E7EB")
+        self.sidebar.grid(row=0, column=0, sticky="nsew")
+        self.sidebar.grid_propagate(False)
 
         # System Logo Header
         logo_label = ctk.CTkLabel(
-            sidebar,
-            text="🎓 Student System",
-            font=("Helvetica", 18, "bold"),
+            self.sidebar, 
+            text="🎓 Student System", 
+            font=("Helvetica", 18, "bold"), 
             text_color=PRIMARY_BLUE
         )
         logo_label.pack(pady=(30, 40), padx=20, anchor="w")
 
-        # Menu Navigation Items — simplified to Dashboard, Students, Settings only
+        # Menu Navigation Items Array Config
         menu_items = [
-            ("🏠 Dashboard", self.menu_dashboard, True),
-            ("👨‍🎓 Students", self.menu_students, False),
-            ("⚙ Settings", self.menu_settings, False),
+            ("🏠 Dashboard", self.menu_dashboard),
+            ("👨‍🎓 Students", self.menu_students),
+            ("📚 Courses", self.menu_courses),
+            ("👨‍🏫 Teachers", self.menu_teachers),
+            ("📅 Attendance", self.menu_attendance),
+            ("📊 Reports", self.menu_reports),
+            ("⚙ Settings", self.menu_settings)
         ]
 
         # Generate Menu Navigation Layout Buttons
-        for text, command, is_active in menu_items:
-            fg = PRIMARY_BLUE if is_active else "transparent"
-            text_col = WHITE if is_active else TEXT_DARK
-            hover_col = HOVER_BLUE if is_active else PANEL_BG
-
+        for text, command in menu_items:
             btn = ctk.CTkButton(
-                sidebar,
+                self.sidebar,
                 text=text,
-                font=("Helvetica", 14, "bold" if is_active else "normal"),
-                fg_color=fg,
-                text_color=text_col,
-                hover_color=hover_col,
+                font=("Helvetica", 14, "normal"),
+                fg_color="transparent",
+                text_color=TEXT_DARK,
+                hover_color=PANEL_BG,
                 height=45,
                 corner_radius=8,
                 anchor="w",
                 command=command
             )
             btn.pack(fill="x", padx=15, pady=4)
+            self.menu_buttons[text] = btn
 
         # Bottom Structural Exit Element
         logout_btn = ctk.CTkButton(
-            sidebar,
+            self.sidebar,
             text="🚪 Logout",
             font=("Helvetica", 14),
             fg_color="transparent",
@@ -104,9 +264,9 @@ class DashboardPage(ctk.CTkFrame):
 
         # Left Module Segment Title Indicator
         title_label = ctk.CTkLabel(
-            top_bar,
-            text="Dashboard",
-            font=("Helvetica", 20, "bold"),
+            top_bar, 
+            text="Dashboard", 
+            font=("Helvetica", 20, "bold"), 
             text_color=TEXT_DARK
         )
         title_label.pack(side="left", padx=30, pady=25)
@@ -127,207 +287,71 @@ class DashboardPage(ctk.CTkFrame):
         search_entry.pack(side="left", padx=(0, 15))
 
         notif_btn = ctk.CTkButton(
-            right_utility_frame,
-            text="🔔",
-            font=("Helvetica", 16),
-            fg_color=PANEL_BG,
-            text_color=TEXT_DARK,
-            hover_color="#E0E7FF",
-            width=40,
-            height=40,
+            right_utility_frame, 
+            text="🔔", 
+            font=("Helvetica", 16), 
+            fg_color=PANEL_BG, 
+            text_color=TEXT_DARK, 
+            hover_color="#E0E7FF", 
+            width=40, 
+            height=40, 
             corner_radius=8
         )
         notif_btn.pack(side="left", padx=(0, 10))
 
         profile_btn = ctk.CTkButton(
-            right_utility_frame,
-            text="👤 Admin",
-            font=("Helvetica", 13, "bold"),
-            fg_color=PANEL_BG,
-            text_color=TEXT_DARK,
-            hover_color="#E0E7FF",
-            height=40,
+            right_utility_frame, 
+            text="👤 Admin", 
+            font=("Helvetica", 13, "bold"), 
+            fg_color=PANEL_BG, 
+            text_color=TEXT_DARK, 
+            hover_color="#E0E7FF", 
+            height=40, 
             corner_radius=8
         )
         profile_btn.pack(side="left")
 
-    def create_main_content(self):
-        """Creates and layouts the primary core user data canvas area."""
-        # Scrollable container mapping layout to content safely
-        scroll_canvas = ctk.CTkScrollableFrame(self.right_container, fg_color=BACKGROUND, corner_radius=0)
-        scroll_canvas.grid(row=1, column=0, sticky="nsew", padx=30, pady=25)
-
-        # Store reference so _swap_content_area can destroy it
-        self.content_frame = scroll_canvas
-
-        # Header Title
-        content_title = ctk.CTkLabel(
-            scroll_canvas,
-            text="Dashboard Overview",
-            font=("Helvetica", 24, "bold"),
-            text_color=TEXT_DARK
-        )
-        content_title.pack(anchor="w", pady=(0, 20))
-
-        # --- Statistics Configuration Layer Grid ---
-        # Updated: Total Students / Active Students / Inactive Students only
-        stats_frame = ctk.CTkFrame(scroll_canvas, fg_color="transparent")
-        stats_frame.pack(fill="x", pady=(0, 30))
-        for i in range(3):
-            stats_frame.grid_columnconfigure(i, weight=1, uniform="stat_card")
-
-        stats_data = [
-            ("Total Students", "1,250", 0),
-            ("Active Students", "1,143", 1),
-            ("Inactive Students", "107", 2),
-        ]
-
-        for title, value, col in stats_data:
-            card = ctk.CTkFrame(stats_frame, fg_color=WHITE, corner_radius=12, border_width=1, border_color="#E5E7EB", height=110)
-            card.grid(row=0, column=col, padx=8, sticky="nsew")
-            card.pack_propagate(False)
-
-            # Left vertical aesthetic accent marker strip
-            accent = ctk.CTkFrame(card, fg_color=PRIMARY_BLUE, width=5, corner_radius=0)
-            accent.pack(side="left", fill="y")
-
-            card_body = ctk.CTkFrame(card, fg_color="transparent")
-            card_body.pack(side="left", fill="both", expand=True, padx=15, pady=15)
-
-            ctk.CTkLabel(card_body, text=title, font=("Helvetica", 13), text_color=TEXT_GRAY).pack(anchor="w")
-            ctk.CTkLabel(card_body, text=value, font=("Helvetica", 26, "bold"), text_color=TEXT_DARK).pack(anchor="w", pady=(2, 0))
-
-        # --- Split MidSection: Left Table vs Right Side Quick Utilities ---
-        split_frame = ctk.CTkFrame(scroll_canvas, fg_color="transparent")
-        split_frame.pack(fill="both", expand=True)
-        split_frame.grid_columnconfigure(0, weight=3, uniform="split_pane")
-        split_frame.grid_columnconfigure(1, weight=1, uniform="split_pane")
-
-        # Left Container: Recent Students Struct
-        table_container = ctk.CTkFrame(split_frame, fg_color=WHITE, corner_radius=12, border_width=1, border_color="#E5E7EB")
-        table_container.grid(row=0, column=0, padx=(0, 12), sticky="nsew")
-
-        ctk.CTkLabel(table_container, text="Recent Students", font=("Helvetica", 16, "bold"), text_color=TEXT_DARK).pack(anchor="w", pady=(20, 15), padx=20)
-
-        # Table Header Layout Config — Student ID, Name, Course, Status, View
-        headers = ["Student ID", "Name", "Course", "Status", "View"]
-        hdr_frame = ctk.CTkFrame(table_container, fg_color=PANEL_BG, height=35, corner_radius=6)
-        hdr_frame.pack(fill="x", pady=(0, 8), padx=20)
-        for idx, h_text in enumerate(headers):
-            hdr_frame.grid_columnconfigure(idx, weight=1, uniform="tbl_col")
-            ctk.CTkLabel(hdr_frame, text=h_text, font=("Helvetica", 12, "bold"), text_color=TEXT_DARK).grid(row=0, column=idx, sticky="w", padx=10, pady=5)
-
-        # Mock Student Data Sets
-        student_records = [
-            ("ST001", "John Doe", "BCA", "Active"),
-            ("ST002", "Jane Smith", "BIT", "Active"),
-            ("ST003", "Michael Johnson", "CSIT", "Active"),
-            ("ST004", "Emily Brown", "BCA", "Inactive"),
-        ]
-
-        # Populate Rows Inline
-        for row_idx, data in enumerate(student_records):
-            row_frame = ctk.CTkFrame(table_container, fg_color="transparent")
-            row_frame.pack(fill="x", pady=4, padx=20)
-
-            for col_idx in range(5):  # 5 columns including View button
-                row_frame.grid_columnconfigure(col_idx, weight=1, uniform="tbl_col")
-
-                if col_idx < 4:
-                    text_val = data[col_idx]
-
-                    if col_idx == 3:  # Status column
-                        is_active = text_val == "Active"
-                        lbl = ctk.CTkLabel(
-                            row_frame,
-                            text=text_val,
-                            font=("Helvetica", 12, "bold"),
-                            text_color="#10B981" if is_active else "#EF4444",
-                            fg_color="#D1FAE5" if is_active else "#FEE2E2",
-                            corner_radius=6,
-                            width=65,
-                            height=22
-                        )
-                        lbl.grid(row=0, column=col_idx, sticky="w", padx=10, pady=5)
-                    else:
-                        ctk.CTkLabel(row_frame, text=text_val, font=("Helvetica", 13), text_color=TEXT_DARK).grid(row=0, column=col_idx, sticky="w", padx=10, pady=5)
-
-                else:  # View button column
-                    view_btn = ctk.CTkButton(
-                        row_frame,
-                        text="View",
-                        font=("Helvetica", 12, "bold"),
-                        fg_color=PANEL_BG,
-                        text_color=PRIMARY_BLUE,
-                        hover_color="#E0E7FF",
-                        width=55,
-                        height=26,
-                        corner_radius=6,
-                        command=self.menu_students
-                    )
-                    view_btn.grid(row=0, column=col_idx, sticky="w", padx=10, pady=5)
-
-            # Horizontal separation grid rule lines
-            if row_idx < len(student_records) - 1:
-                ctk.CTkFrame(table_container, fg_color="#F3F4F6", height=1).pack(fill="x", pady=2, padx=20)
-
-        # Right Container: Quick Actions Grid Setup
-        # Updated: Add Student / Student Management / Settings only
-        actions_container = ctk.CTkFrame(split_frame, fg_color=WHITE, corner_radius=12, border_width=1, border_color="#E5E7EB")
-        actions_container.grid(row=0, column=1, padx=(12, 0), sticky="nsew")
-
-        ctk.CTkLabel(actions_container, text="Quick Actions", font=("Helvetica", 16, "bold"), text_color=TEXT_DARK).pack(anchor="w", pady=(20, 15), padx=20)
-
-        actions_list = [
-            ("➕ Add Student", self.menu_students),
-            ("👨‍🎓 Student Management", self.menu_students),
-            ("⚙ Settings", self.menu_settings),
-        ]
-
-        for act_text, act_cmd in actions_list:
-            ctk.CTkButton(
-                actions_container,
-                text=act_text,
-                font=("Helvetica", 13, "bold"),
-                fg_color=PANEL_BG,
-                text_color=PRIMARY_BLUE,
-                hover_color="#E0E7FF",
-                height=45,
-                corner_radius=8,
-                anchor="w",
-                command=act_cmd
-            ).pack(fill="x", pady=6, padx=20)
-
-    # ── Navigation helper ────────────────────────────────────────────────────
-    def _swap_content_area(self, new_widget_class, **kwargs):
-        """Destroy current content frame and embed new_widget_class in its place."""
-        self.content_frame.destroy()
-        self.content_frame = new_widget_class(self.right_container, **kwargs)
-        self.content_frame.grid(row=1, column=0, sticky="nsew")
-
     # --- SIDEBAR INTERACTION EVENT METHODS ---
+    
     def menu_dashboard(self):
-        self.content_frame.destroy()
-        self.create_main_content()
-
+        self.set_active_menu("🏠 Dashboard")
+        self.show_page(DashboardHomePage)
+        
     def menu_students(self):
-        self._swap_content_area(StudentManagementPage)
-
-    def menu_settings(self):
-        self._swap_content_area(SettingsPage)
-
-    def menu_logout(self):
+        self.set_active_menu("👨‍🎓 Students")
+        self.show_page(StudentManagementPage)
+        
+    def menu_courses(self): 
+        self.set_active_menu("📚 Courses")
+        self.show_page(CoursesPage)
+        
+    def menu_teachers(self): 
+        self.set_active_menu("👨‍🏫 Teachers")
+        self.show_page(TeachersPage)
+        
+    def menu_attendance(self): 
+        self.set_active_menu("📅 Attendance")
+        self.show_page(AttendancePage)
+        
+    def menu_reports(self): 
+        self.set_active_menu("📊 Reports")
+        self.show_page(ReportsPage)
+        
+    def menu_settings(self): 
+        self.set_active_menu("⚙ Settings")
+        self.show_page(SettingsPage)
+        
+    def menu_logout(self): 
         print("Logout")
-
 
 if __name__ == "__main__":
     root = ctk.CTk()
     root.title("Student Management System - Dashboard")
-
+    
     # Process responsive scaling frame constraints cleanly
     root.configure(fg_color=BACKGROUND)
     root.after(100, lambda: root.state("zoomed"))
-
+    
     # Initialize UI Component Canvas Instance
     app = DashboardPage(root)
     root.mainloop()

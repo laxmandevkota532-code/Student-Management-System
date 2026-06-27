@@ -36,7 +36,7 @@ class SignupPage(ctk.CTkFrame):
 
         self.app_title = ctk.CTkLabel(
             self.form_container,
-            text="🎓 Student Management System",
+            text="🎓 College Management System",
             font=("Helvetica", 16, "bold"),
             text_color=PRIMARY_BLUE
         )

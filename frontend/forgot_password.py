@@ -58,7 +58,7 @@ class ForgotPasswordPage(ctk.CTkFrame):
 
         logo_label = ctk.CTkLabel(
             bar,
-            text="🎓  Student Management System",
+            text="🎓  College Management System",
             font=("Helvetica", 15, "bold"),
             text_color=PRIMARY_BLUE,
         )

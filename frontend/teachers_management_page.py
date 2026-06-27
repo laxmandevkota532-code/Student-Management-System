@@ -4,9 +4,9 @@ import customtkinter as ctk
 ctk.set_appearance_mode("Light")
 ctk.set_default_color_theme("blue")
 
-class TeachersPage(ctk.CTk):
-    def __init__(self):
-        super().__init__()
+class TeachersPage(ctk.CTkFrame):
+    def __init__(self, master):
+        super().__init__(master, fg_color="#F8F9FC")
 
         # --- Color Palette ---
         self.PRIMARY_BLUE = "#4F5BD5"
@@ -18,18 +18,10 @@ class TeachersPage(ctk.CTk):
         self.WHITE = "#FFFFFF"
         self.SUCCESS_GREEN = "#10B981"
         self.DANGER_RED = "#EF4444"
-
-        # --- Window Configuration ---
-        self.title("Teachers Management System")
-        self.geometry("1280x720")
-        self.configure(fg_color=self.BACKGROUND)
-        
-        # Open in Full Screen automatically
-        self.after(100, lambda: self.state("zoomed"))
         
         # Responsive Layout Configuration
-        self.grid_columnconfigure(1, weight=1)
-        self.grid_rowconfigure(0, weight=1)
+        self.grid_columnconfigure(0, weight=1)
+        self.grid_rowconfigure(1, weight=1)
 
         # --- Sample Data ---
         self.teachers_data = [
@@ -40,59 +32,13 @@ class TeachersPage(ctk.CTk):
             {"id": "TCH005", "name": "David Wilson", "subject": "Computer Networks", "phone": "9841000005", "email": "david@gmail.com", "experience": "6 Years", "status": "Active"},
         ]
 
-        self.create_sidebar()
         self.create_main_content()
-
-    def create_sidebar(self):
-        """Creates the navigation sidebar matching the uniform design system."""
-        sidebar = ctk.CTkFrame(self, width=240, corner_radius=0, fg_color=self.WHITE)
-        sidebar.grid(row=0, column=0, sticky="nsew")
-        sidebar.grid_propagate(False)
-        sidebar.grid_rowconfigure(8, weight=1)
-
-        # Brand Identity Label
-        brand_label = ctk.CTkLabel(sidebar, text="EduManager", font=ctk.CTkFont(size=22, weight="bold"), text_color=self.PRIMARY_BLUE)
-        brand_label.grid(row=0, column=0, padx=30, pady=(30, 30), sticky="w")
-
-        # Sidebar Menu Items
-        menu_items = ["Dashboard", "Students", "Courses", "Teachers", "Attendance", "Reports", "Settings"]
-        
-        for idx, item in enumerate(menu_items, start=1):
-            if item == "Teachers":
-                # Active State Styling
-                btn = ctk.CTkButton(sidebar, text=item, font=ctk.CTkFont(size=14, weight="bold"), fg_color=self.PANEL_BG, text_color=self.PRIMARY_BLUE, anchor="w", height=40, corner_radius=6)
-            else:
-                # Passive State Styling
-                btn = ctk.CTkButton(sidebar, text=item, font=ctk.CTkFont(size=14), fg_color="transparent", text_color=self.TEXT_GRAY, hover_color=self.PANEL_BG, anchor="w", height=40, corner_radius=6)
-            
-            btn.grid(row=idx, column=0, padx=20, pady=4, sticky="ew")
-
-        # Fixed Logout Placement at Bottom
-        logout_btn = ctk.CTkButton(sidebar, text="Logout", font=ctk.CTkFont(size=14), fg_color="transparent", text_color=self.TEXT_GRAY, hover_color=self.PANEL_BG, anchor="w", height=40, corner_radius=6)
-        logout_btn.grid(row=9, column=0, padx=20, pady=20, sticky="ew")
 
     def create_main_content(self):
         """Builds responsive layout area panel structures for main content."""
-        main_container = ctk.CTkFrame(self, corner_radius=0, fg_color=self.BACKGROUND)
-        main_container.grid(row=0, column=1, sticky="nsew")
-        main_container.grid_columnconfigure(0, weight=1)
-        main_container.grid_rowconfigure(2, weight=1)
-
-        # Top Bar Container Setup
-        top_bar = ctk.CTkFrame(main_container, height=70, corner_radius=0, fg_color=self.WHITE)
-        top_bar.grid(row=0, column=0, sticky="ew")
-        top_bar.grid_columnconfigure(0, weight=1)
-        top_bar.grid_propagate(False)
-        
-        page_title = ctk.CTkLabel(top_bar, text="Teachers Management", font=ctk.CTkFont(size=20, weight="bold"), text_color=self.TEXT_DARK)
-        page_title.grid(row=0, column=0, padx=30, pady=20, sticky="w")
-        
-        user_profile = ctk.CTkLabel(top_bar, text="Admin User", font=ctk.CTkFont(size=14), text_color=self.TEXT_GRAY)
-        user_profile.grid(row=0, column=1, padx=30, pady=20, sticky="e")
-
         # Top Action Bar Layout Container
-        action_bar = ctk.CTkFrame(main_container, fg_color="transparent")
-        action_bar.grid(row=1, column=0, padx=30, pady=(25, 15), sticky="ew")
+        action_bar = ctk.CTkFrame(self, fg_color="transparent")
+        action_bar.grid(row=0, column=0, padx=30, pady=(25, 15), sticky="ew")
         action_bar.grid_columnconfigure(0, weight=1)
 
         search_entry = ctk.CTkEntry(action_bar, placeholder_text="Search Teacher...", width=300, height=40, fg_color=self.WHITE, border_color=self.PANEL_BG, text_color=self.TEXT_DARK)
@@ -102,8 +48,8 @@ class TeachersPage(ctk.CTk):
         add_btn.grid(row=0, column=1, sticky="e")
 
         # Central Layout Data Matrix Display Segment
-        table_container = ctk.CTkFrame(main_container, fg_color=self.WHITE, corner_radius=8)
-        table_container.grid(row=2, column=0, padx=30, pady=(0, 30), sticky="nsew")
+        table_container = ctk.CTkFrame(self, fg_color=self.WHITE, corner_radius=8)
+        table_container.grid(row=1, column=0, padx=30, pady=(0, 30), sticky="nsew")
         table_container.grid_columnconfigure(0, weight=1)
         table_container.grid_rowconfigure(1, weight=1)
 
@@ -176,5 +122,8 @@ class TeachersPage(ctk.CTk):
             delete_btn.grid(row=0, column=2, padx=2)
 
 if __name__ == "__main__":
-    app = TeachersPage()
-    app.mainloop()
+    root = ctk.CTk()
+    root.geometry("1200x700")
+    page = TeachersPage(root)
+    page.pack(fill="both", expand=True)
+    root.mainloop()

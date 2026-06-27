@@ -4,9 +4,9 @@ import customtkinter as ctk
 ctk.set_appearance_mode("Light")
 ctk.set_default_color_theme("blue")
 
-class CoursesPage(ctk.CTk):
-    def __init__(self):
-        super().__init__()
+class CoursesPage(ctk.CTkFrame):
+    def __init__(self, master):
+        super().__init__(master, fg_color="#F8F9FC")
 
         # --- Color Palette ---
         self.PRIMARY_BLUE = "#4F5BD5"
@@ -19,16 +19,8 @@ class CoursesPage(ctk.CTk):
         self.SUCCESS_GREEN = "#10B981"
         self.DANGER_RED = "#EF4444"
 
-        # --- Window Configuration ---
-        self.title("Courses Management System")
-        self.geometry("1280x720")
-        self.configure(fg_color=self.BACKGROUND)
-        
-        # Open in Full Screen automatically
-        self.after(100, lambda: self.state("zoomed"))
-        
         # Responsive Layout Configuration
-        self.grid_columnconfigure(1, weight=1)
+        self.grid_columnconfigure(0, weight=1)
         self.grid_rowconfigure(0, weight=1)
 
         # --- Sample Data ---
@@ -40,41 +32,12 @@ class CoursesPage(ctk.CTk):
             {"id": "CRS005", "name": "BIM", "duration": "4 Years", "fee": "Rs. 470000", "students": "150", "status": "Active"},
         ]
 
-        self.create_sidebar()
         self.create_main_content()
-
-    def create_sidebar(self):
-        """Creates the navigation sidebar mimicking the requested page design."""
-        sidebar = ctk.CTkFrame(self, width=240, corner_radius=0, fg_color=self.WHITE)
-        sidebar.grid(row=0, column=0, sticky="nsew")
-        sidebar.grid_propagate(False)
-        sidebar.grid_rowconfigure(8, weight=1)
-
-        # Brand Identity Label
-        brand_label = ctk.CTkLabel(sidebar, text="EduManager", font=ctk.CTkFont(size=22, weight="bold"), text_color=self.PRIMARY_BLUE)
-        brand_label.grid(row=0, column=0, padx=30, pady=(30, 30), sticky="w")
-
-        # Sidebar Menu Items
-        menu_items = ["Dashboard", "Students", "Courses", "Teachers", "Attendance", "Reports", "Settings"]
-        
-        for idx, item in enumerate(menu_items, start=1):
-            if item == "Courses":
-                # Active State Design System Stylings
-                btn = ctk.CTkButton(sidebar, text=item, font=ctk.CTkFont(size=14, weight="bold"), fg_color=self.PANEL_BG, text_color=self.PRIMARY_BLUE, anchor="w", height=40, corner_radius=6)
-            else:
-                # Standard Passive Menu Items Stylings
-                btn = ctk.CTkButton(sidebar, text=item, font=ctk.CTkFont(size=14), fg_color="transparent", text_color=self.TEXT_GRAY, hover_color=self.PANEL_BG, anchor="w", height=40, corner_radius=6)
-            
-            btn.grid(row=idx, column=0, padx=20, pady=4, sticky="ew")
-
-        # Logout Placed Static at the Base Layout System Container
-        logout_btn = ctk.CTkButton(sidebar, text="Logout", font=ctk.CTkFont(size=14), fg_color="transparent", text_color=self.TEXT_GRAY, hover_color=self.PANEL_BG, anchor="w", height=40, corner_radius=6)
-        logout_btn.grid(row=9, column=0, padx=20, pady=20, sticky="ew")
 
     def create_main_content(self):
         """Builds responsive layout area panel structures."""
         main_container = ctk.CTkFrame(self, corner_radius=0, fg_color=self.BACKGROUND)
-        main_container.grid(row=0, column=1, sticky="nsew")
+        main_container.grid(row=0, column=0, sticky="nsew")
         main_container.grid_columnconfigure(0, weight=1)
         main_container.grid_rowconfigure(2, weight=1)
 
@@ -172,6 +135,10 @@ class CoursesPage(ctk.CTk):
             delete_btn = ctk.CTkButton(action_panel, text="Delete", font=ctk.CTkFont(size=11), fg_color="#FEE2E2", hover_color="#FCA5A5", text_color=self.DANGER_RED, width=46, height=24, corner_radius=4)
             delete_btn.grid(row=0, column=2, padx=2)
 
+
 if __name__ == "__main__":
-    app = CoursesPage()
-    app.mainloop()
+    root = ctk.CTk()
+    root.geometry("1200x700")
+    page = CoursesPage(root)
+    page.pack(fill="both", expand=True)
+    root.mainloop()

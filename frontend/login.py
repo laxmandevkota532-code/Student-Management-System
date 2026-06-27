@@ -18,7 +18,7 @@ WHITE = "#FFFFFF"
 class LoginPage:
     def __init__(self, root):
         self.root = root
-        self.root.title("Student Management System")
+        self.root.title("College Management System")
         
         # Set theme and window configuration
         ctk.set_appearance_mode("light")

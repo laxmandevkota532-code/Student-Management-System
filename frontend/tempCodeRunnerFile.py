@@ -1,1 +1,1 @@
-from settings_page import SettingsPage
+from frontend.dashboard import DashboardPage 

@@ -5,9 +5,10 @@ import sys
 ctk.set_appearance_mode("Light")
 ctk.set_default_color_theme("blue")
 
-class SettingsPage(ctk.CTk):
-    def __init__(self):
-        super().__init__()
+class SettingsPage(ctk.CTkFrame):
+    def __init__(self, master):
+        super().__init__(master, fg_color="#F8F9FC")
+        
         # --- Color Palette ---
         self.PRIMARY_BLUE = "#4F5BD5"
         self.HOVER_BLUE = "#3F4ACB"
@@ -18,67 +19,17 @@ class SettingsPage(ctk.CTk):
         self.WHITE = "#FFFFFF"
         self.SUCCESS_GREEN = "#10B981"
 
-        # --- Window Configuration ---
-        self.title("Settings")
-        self.geometry("1280x720")
-        self.configure(fg_color=self.BACKGROUND)
-        
-        # Open in Full Screen automatically with fallback
-        self.after(100, self.apply_fullscreen)
-        
-        # Responsive Layout Configuration
-        self.grid_columnconfigure(1, weight=1)
-        self.grid_rowconfigure(0, weight=1)
+        # Configure page grid layout as required
+        self.grid_columnconfigure(0, weight=1)
+        self.grid_rowconfigure(1, weight=1)
 
-        self.create_sidebar()
         self.create_main_content()
-
-    def apply_fullscreen(self):
-        try:
-            if sys.platform.startswith("win"):
-                self.state("zoomed")
-            else:
-                self.attributes("-zoomed", True)
-        except Exception:
-            self.attributes("-fullscreen", True)
-
-    def create_sidebar(self):
-        """Creates the navigation sidebar matching the uniform design system."""
-        sidebar = ctk.CTkFrame(self, width=240, corner_radius=0, fg_color=self.WHITE)
-        sidebar.grid(row=0, column=0, sticky="nsew")
-        sidebar.grid_propagate(False)
-        sidebar.grid_rowconfigure(8, weight=1)
-
-        # Brand Identity Label
-        brand_label = ctk.CTkLabel(sidebar, text="EduManager", font=ctk.CTkFont(size=22, weight="bold"), text_color=self.PRIMARY_BLUE)
-        brand_label.grid(row=0, column=0, padx=30, pady=(30, 30), sticky="w")
-
-        # Sidebar Menu Items
-        menu_items = ["Dashboard", "Students", "Courses", "Teachers", "Attendance", "Reports", "Settings"]
-        
-        for idx, item in enumerate(menu_items, start=1):
-            if item == "Settings":
-                # Active State Styling
-                btn = ctk.CTkButton(sidebar, text=item, font=ctk.CTkFont(size=14, weight="bold"), fg_color=self.PANEL_BG, text_color=self.PRIMARY_BLUE, anchor="w", height=40, corner_radius=6)
-            else:
-                # Passive State Styling
-                btn = ctk.CTkButton(sidebar, text=item, font=ctk.CTkFont(size=14), fg_color="transparent", text_color=self.TEXT_GRAY, hover_color=self.PANEL_BG, anchor="w", height=40, corner_radius=6)
-            
-            btn.grid(row=idx, column=0, padx=20, pady=4, sticky="ew")
-
-        # Fixed Logout Placement at Bottom
-        logout_btn = ctk.CTkButton(sidebar, text="Logout", font=ctk.CTkFont(size=14), fg_color="transparent", text_color=self.TEXT_GRAY, hover_color=self.PANEL_BG, anchor="w", height=40, corner_radius=6, command=lambda: print("Logout Clicked"))
-        logout_btn.grid(row=9, column=0, padx=20, pady=20, sticky="ew")
 
     def create_main_content(self):
         """Builds responsive scrollable layout framework for system settings."""
-        main_container = ctk.CTkFrame(self, corner_radius=0, fg_color=self.BACKGROUND)
-        main_container.grid(row=0, column=1, sticky="nsew")
-        main_container.grid_columnconfigure(0, weight=1)
-        main_container.grid_rowconfigure(1, weight=1)
-
+        
         # 1. Top Bar Container Setup
-        top_bar = ctk.CTkFrame(main_container, height=70, corner_radius=0, fg_color=self.WHITE)
+        top_bar = ctk.CTkFrame(self, height=70, corner_radius=0, fg_color=self.WHITE)
         top_bar.grid(row=0, column=0, sticky="ew")
         top_bar.grid_columnconfigure(0, weight=1)
         top_bar.grid_propagate(False)
@@ -90,7 +41,7 @@ class SettingsPage(ctk.CTk):
         user_profile.grid(row=0, column=1, padx=30, pady=20, sticky="e")
 
         # Scrollable Form Content Area
-        scroll_content = ctk.CTkScrollableFrame(main_container, fg_color="transparent", corner_radius=0)
+        scroll_content = ctk.CTkScrollableFrame(self, fg_color="transparent", corner_radius=0)
         scroll_content.grid(row=1, column=0, padx=30, pady=20, sticky="nsew")
         scroll_content.grid_columnconfigure(0, weight=1)
 
@@ -221,7 +172,8 @@ class SettingsPage(ctk.CTk):
         pref_save_btn.grid(row=2, column=0, padx=24, pady=(15, 20), sticky="e")
 
 if __name__ == "__main__":
-    app = SettingsPage()
-    app.mainloop()
-
-    
+    root = ctk.CTk()
+    root.geometry("1200x700")
+    page = SettingsPage(root)
+    page.pack(fill="both", expand=True)
+    root.mainloop()
